@@ -1,0 +1,30 @@
+{
+  "name": "tmc-test-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "nodemon src/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KrFreeFly/TMC-test-backend.git"
+  },
+  "author": "Mikhail Gorbonosov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KrFreeFly/TMC-test-backend/issues"
+  },
+  "homepage": "https://github.com/KrFreeFly/TMC-test-backend#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "joi": "^17.7.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
+    "nodemon": "^2.0.20"
+  }
+}
