@@ -12,8 +12,25 @@ router.get(
   validator.getOpts,
   (req, res, next) => {
     try {
-      const { limit, page, sortColumn, sortDirection } = req.query;
-      const result = storage.select({ limit, page, sortColumn, sortDirection });
+      const {
+        limit,
+        page,
+        sortColumn,
+        sortDirection,
+        lastOptions,
+        filterFirstName,
+        filterLastName,
+      } = req.query;
+      if (lastOptions !== true) storage.setLastOptions({ sortColumn, sortDirection, filterFirstName, filterLastName });
+      const result = storage.select({
+        limit,
+        page,
+        sortColumn,
+        sortDirection,
+        lastOptions,
+        filterFirstName,
+        filterLastName,
+      });
       return res.status(200).json(result);
     } catch (e) {
       return next(e);

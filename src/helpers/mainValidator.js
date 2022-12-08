@@ -7,8 +7,11 @@ const getOpts = validateQuery(
   Joi.object({
     limit: Joi.number().integer().min(1),
     page: Joi.number().integer().min(1),
-    sortColumn: Joi.string().valid('firstName', 'lastName', 'id'),
-    sortDirection: Joi.string().valid('ASC', 'DESC'),
+    sortColumn: Joi.string().valid('firstName', 'lastName', 'id', '').default('id'),
+    sortDirection: Joi.string().valid('asc', 'desc', '').default('asc'),
+    lastOptions: Joi.boolean(),
+    filterFirstName: Joi.string(),
+    filterLastName: Joi.string(),
   })
 );
 

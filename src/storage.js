@@ -22,20 +22,39 @@ class Storage {
     this.defaultSortColumn = 'id';
     this.defaultLimit = 10;
     this.defaultPage = 1;
+    this.lastOptions = {};
   }
 
-  select({ limit, page, sortColumn, sortDirection }) {
+  select({ limit, page, sortColumn, sortDirection, lastOptions, filterFirstName, filterLastName }) {
+    if (lastOptions === true) {
+      sortDirection = this.lastOptions.sortDirection;
+      sortColumn = this.lastOptions.sortColumn;
+      filterFirstName = this.lastOptions.filterFirstName;
+      filterLastName = this.lastOptions.filterLastName;
+    }
+    console.log(filterLastName, filterFirstName)
+    const filteredOpts = this.search({ filterFirstName, filterLastName });
+
     sortColumn = (sortColumn || this.defaultSortColumn);
-    let sortedOpts = this.storage.sort((a, b) => {
+    let sortedOpts = filteredOpts.sort((a, b) => {
       if (a[sortColumn] > b[sortColumn]) return 1;
       if (a[sortColumn] === b[sortColumn]) return 0;
       if (a[sortColumn] < b[sortColumn]) return -1;
     });
-    if (sortDirection === 'DESC') sortedOpts = sortedOpts.reverse();
+
+    if (sortDirection === 'desc') sortedOpts = sortedOpts.reverse();
     limit = (+limit || this.defaultLimit);
     page = (+page || this.defaultPage);
     const offset = (page - 1) * limit;
-    return sortedOpts.slice(offset, limit + offset)
+    console.log(this.lastOptions)
+    return {
+      items: sortedOpts.slice(offset, limit + offset),
+      total: sortedOpts.length,
+      sortColumn,
+      sortDirection,
+      filterFirstName,
+      filterLastName,
+    }
   }
 
   selectSaved() {
@@ -44,10 +63,19 @@ class Storage {
     })
   }
 
-  search({ name }) {
+  search({ filterFirstName, filterLastName }) {
+    if (!filterLastName && !filterFirstName) return this.storage;
     return this.storage.filter((item) => {
-      return item.firstName.toLowerCase().includes(name.toLowerCase())
-        || item.lastName.toLowerCase().includes(name.toLowerCase())
+      if (filterFirstName && filterLastName) {
+        return item.firstName.toLowerCase().includes(filterFirstName.toLowerCase())
+          && item.lastName.toLowerCase().includes(filterLastName.toLowerCase());
+      }
+      if (filterFirstName) {
+        return item.firstName.toLowerCase().includes(filterFirstName.toLowerCase());
+      }
+      if (filterLastName) {
+        return item.lastName.toLowerCase().includes(filterLastName.toLowerCase());
+      }
     })
   }
 
@@ -63,6 +91,10 @@ class Storage {
     if (index === -1) throw new HttpError(404, OPTION_NOT_FOUND);
     this.storage[index].saved = false;
     return true;
+  }
+
+  setLastOptions ({ sortColumn, sortDirection, filterFirstName, filterLastName }) {
+    this.lastOptions = { sortColumn, sortDirection, filterFirstName, filterLastName };
   }
 }
 
