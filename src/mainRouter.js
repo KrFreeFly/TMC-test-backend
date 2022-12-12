@@ -80,6 +80,20 @@ router.patch(
   }
 );
 
+// PUT
+
+router.put(
+  '/options',
+  validator.customSort,
+  (req, res, next) => {
+    try {
+      storage.saveCustomSorted({ sortedOptions: req.body.options });
+    } catch (e) {
+      return next(e);
+    }
+  }
+)
+
 // DELETE
 
 router.delete(

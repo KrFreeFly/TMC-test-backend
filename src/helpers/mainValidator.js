@@ -1,14 +1,14 @@
 const Joi = require('joi');
 const {
-  validateParams, validateQuery,
+  validateParams, validateQuery, validateBody,
 } = require('../middlewares/validatorMiddleware');
 
 const getOpts = validateQuery(
   Joi.object({
     limit: Joi.number().integer().min(1),
     page: Joi.number().integer().min(1),
-    sortColumn: Joi.string().valid('firstName', 'lastName', 'id', '').default('id'),
-    sortDirection: Joi.string().valid('asc', 'desc', '').default('asc'),
+    sortColumn: Joi.string().valid('firstName', 'lastName', 'id'),
+    sortDirection: Joi.string().valid('asc', 'desc'),
     lastOptions: Joi.boolean(),
     filterFirstName: Joi.string(),
     filterLastName: Joi.string(),
@@ -31,8 +31,20 @@ const searchOpts = validateQuery(
   })
 )
 
+const customSort = validateBody(
+  Joi.object({
+    options: Joi.array().items(Joi.object({
+      id: Joi.number().required(),
+      firstName: Joi.string().required(),
+      lastName: Joi.string().required(),
+      saved: Joi.boolean().required(),
+    })).required(),
+  })
+)
+
 module.exports = {
   getOpts,
   updateOpts,
   searchOpts,
+  customSort,
 };

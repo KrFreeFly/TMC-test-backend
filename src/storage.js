@@ -32,26 +32,24 @@ class Storage {
       filterFirstName = this.lastOptions.filterFirstName;
       filterLastName = this.lastOptions.filterLastName;
     }
-    console.log(filterLastName, filterFirstName)
-    const filteredOpts = this.search({ filterFirstName, filterLastName });
+    let filteredOpts = this.search({ filterFirstName, filterLastName });
 
-    sortColumn = (sortColumn || this.defaultSortColumn);
-    let sortedOpts = filteredOpts.sort((a, b) => {
-      if (a[sortColumn] > b[sortColumn]) return 1;
-      if (a[sortColumn] === b[sortColumn]) return 0;
-      if (a[sortColumn] < b[sortColumn]) return -1;
-    });
-
-    if (sortDirection === 'desc') sortedOpts = sortedOpts.reverse();
+    if (sortColumn) {
+      filteredOpts = filteredOpts.sort((a, b) => {
+        if (a[sortColumn] > b[sortColumn]) return 1;
+        if (a[sortColumn] === b[sortColumn]) return 0;
+        if (a[sortColumn] < b[sortColumn]) return -1;
+      });
+      if (sortDirection === 'desc') filteredOpts = filteredOpts.reverse();
+    }
     limit = (+limit || this.defaultLimit);
     page = (+page || this.defaultPage);
     const offset = (page - 1) * limit;
-    console.log(this.lastOptions)
     return {
-      items: sortedOpts.slice(offset, limit + offset),
-      total: sortedOpts.length,
-      sortColumn,
-      sortDirection,
+      items: filteredOpts.slice(offset, limit + offset),
+      total: filteredOpts.length,
+      sortColumn: sortColumn || '',
+      sortDirection: sortDirection || '',
       filterFirstName,
       filterLastName,
     }
@@ -64,7 +62,7 @@ class Storage {
   }
 
   search({ filterFirstName, filterLastName }) {
-    if (!filterLastName && !filterFirstName) return this.storage;
+    if (!filterLastName && !filterFirstName) return [...this.storage];
     return this.storage.filter((item) => {
       if (filterFirstName && filterLastName) {
         return item.firstName.toLowerCase().includes(filterFirstName.toLowerCase())
@@ -95,6 +93,10 @@ class Storage {
 
   setLastOptions ({ sortColumn, sortDirection, filterFirstName, filterLastName }) {
     this.lastOptions = { sortColumn, sortDirection, filterFirstName, filterLastName };
+  }
+
+  saveCustomSorted ({ sortedOptions }) {
+    this.storage.splice(0, sortedOptions.length, ...sortedOptions);
   }
 }
 
